@@ -12,57 +12,57 @@ typedef unsigned char move_t;
 typedef unsigned short mask_t;
 
 /*
- * This struct represents the state of a Sudoku puzzle, along
+ * This struct represents the sudoku of a Sudoku puzzle, along
  * with some cached constraints data to speed up solution
  */
-typedef struct _state {
+typedef struct _sudoku {
     int solved;
     move_t rows[9];
     mask_t blocks[9];
     mask_t columns[9];
     mask_t grid[81];
-} State;
+} Sudoku;
 
 
 /*
- * Allocates a new instance of State*
+ * Allocates a new instance of Sudoku*
  * New instances are always zero-filled
  */
-State* state_create(void);
+Sudoku* sudoku_create(void);
 
 /*
- * Creates a deep clone of an existing State
+ * Creates a deep clone of an existing Sudoku
  */
-State* state_clone(const State*);
+Sudoku* sudoku_clone(const Sudoku*);
 
 /*
- * Given a State and a cell index, returns a bit mask
+ * Given a Sudoku and a cell index, returns a bit mask
  * where 1 represents a viable candidate move
  */
-mask_t state_candidate(const State*, index_t);
+mask_t sudoku_candidate(const Sudoku*, index_t);
 
 /*
  * Determines the best cell to fill next
  */
-index_t state_next(const State*);
+index_t sudoku_next(const Sudoku*);
 
 /*
- * Updates an existing State to fill in a cell
+ * Updates an existing Sudoku to fill in a cell
  * Also updates all cached constrains data
  */
-State* state_move(State*, index_t, move_t);
+Sudoku* sudoku_move(Sudoku*, index_t, move_t);
 
 /*
  * Recursively solves a specific puzzle
  * Always returns a new instance; the original instance
  * remains unchanged
  */
-State* state_solve(const State*);
+Sudoku* sudoku_solve(const Sudoku*);
 
 /*
  * Pretty-prints a puzzle to stdout
  */
-void state_print(const State*);
+void sudoku_print(const Sudoku*);
 
 
 #endif

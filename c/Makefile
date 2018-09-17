@@ -15,7 +15,7 @@ clean:
 	rm -rf out
 	rm -f solver
 
-solver: out/main.o out/state.o
+solver: out/main.o out/sudoku.o
 	gcc -o solver $^
 
 out/%.o: %.c

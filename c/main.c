@@ -1,10 +1,10 @@
 #include<stdio.h>
-#include "state.h"
+#include "sudoku.h"
 #include "trace.h"
 
 int main(int argc, char** argv) {
 
-    State* state = state_create();
+    Sudoku* sudoku = sudoku_create();
     
     if (argc > 1) {
         char* input = argv[1];
@@ -15,11 +15,11 @@ int main(int argc, char** argv) {
                 DBG_WARN("Skipping input cell: %d\n", move);
                 continue;
             } else if (move != 0) {
-                state_move(state, i, move);
+                sudoku_move(sudoku, i, move);
             }
         }
     }
     
-    State* solved = state_solve(state);
-    state_print(solved);
+    Sudoku* solved = sudoku_solve(sudoku);
+    sudoku_print(solved);
 }
