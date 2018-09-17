@@ -22,7 +22,7 @@ mask_t state_candidate(const State* state, index_t i) {
     if (state->grid[i]) {
         return 0; 
     }
-    return ~(state->rows[i / 9] | state->columns[i % 9] | state->blocks[(i / 27) * 3 + (i % 9) / 3]) & 0x1FF;
+    return ~(state->rows[ROW(i)] | state->columns[COL(i)] | state->blocks[BOX(i)]) & 0x1FF;
 }
 
 State* state_move(State* state, index_t i, move_t m) {
@@ -33,9 +33,9 @@ State* state_move(State* state, index_t i, move_t m) {
 
     state->solved += 1;
     state->grid[i] = m;
-    state->rows[i / 9] |= 1 << (m - 1);
-    state->columns[i % 9] |= 1 << (m - 1);
-    state->blocks[(i / 27) * 3 + (i % 9) / 3] |= 1 << (m - 1);
+    state->rows[ROW(i)] |= MASK(m);
+    state->columns[COL(i)] |= MASK(m);
+    state->blocks[BOX(i)] |= MASK(m);
 
     return state;
 }

@@ -1,6 +1,12 @@
 #ifndef STATE_H
 #define STATE_H
 
+#define ROW(i) (i / 9)
+#define COL(i) (i % 9)
+#define BOX(i) ((i / 27) * 3 + (i % 9) / 3)
+#define MASK(move) (1 << (m - 1))
+
+
 typedef unsigned char index_t;
 typedef unsigned char move_t;
 typedef unsigned short mask_t;
