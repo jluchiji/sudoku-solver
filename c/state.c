@@ -4,6 +4,12 @@
 #include "state.h"
 #include "trace.h"
 
+int _count_bits(uint32_t i) {
+     i = i - ((i >> 1) & 0x55555555);
+     i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
+     return (((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
+}
+
 State* state_create() {
     State* ptr = (State*)malloc(sizeof(State));
     if (ptr) {
@@ -25,6 +31,21 @@ mask_t state_candidate(const State* state, index_t i) {
     return ~(state->rows[ROW(i)] | state->columns[COL(i)] | state->blocks[BOX(i)]) & 0x1FF;
 }
 
+index_t state_next(const State* state) {
+    int min = 9;
+    index_t next = 0;
+    for (index_t z = 0; z < 81; z++) {
+        int len = _count_bits(state_candidate(state, z));
+        DBG_VERBOSE("len = %d\n", len);
+        if (len < min && !state->grid[z]) {
+            next = z;
+            min = len;
+        }
+    }
+    DBG_INFO("min = %d, next = %d\n", min, next);
+    return next;
+}
+
 State* state_move(State* state, index_t i, move_t m) {
     if (!(state_candidate(state, i) & (1 << (m - 1)))) {
         printf("Invalid move");
@@ -40,31 +61,15 @@ State* state_move(State* state, index_t i, move_t m) {
     return state;
 }
 
-int numberOfSetBits(uint32_t i) {
-     i = i - ((i >> 1) & 0x55555555);
-     i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
-     return (((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
-}
-
 State* state_solve(const State* state) {
     if (state->solved == 81) {
         return state_clone(state);
     }
 
-    int min = 9;
-    index_t next = 0;
-    for (index_t z = 0; z < 81; z++) {
-        int len = numberOfSetBits(state_candidate(state, z));
-        DBG_VERBOSE("len = %d\n", len);
-        if (len < min && !state->grid[z]) {
-            next = z;
-            min = len;
-        }
-    }
-    if (!min) {
+    index_t next = state_next(state);
+    if (!_count_bits(state_candidate(state, next))) {
         return NULL;
     }
-    DBG_INFO("min = %d, next = %d\n", min, next);
 
     for (index_t j = 0; j < 9; j++) {
         if (!(state_candidate(state, next) & (1 << j))) {
@@ -93,11 +98,6 @@ void state_print(const State* state) {
         if (i != 0 && !(i % 9)) {
             printf("-------+-------+-------\n");
         }
-        printf(" %d %d %d ", cell[0], cell[1], cell[2]);
-        if ((i + 1) % 3) {
-            printf("|");
-        } else {
-            printf("\n");
-        }
+        printf(" %d %d %d %s", cell[0], cell[1], cell[2], (i + 1) % 3 ? "|" : "\n");
     }
 }
